@@ -5,10 +5,16 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\StorageFileController;
 use App\Models\Book;
 use App\Models\Peminjaman;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
+
+// Rute fallback untuk menyajikan file cover buku dan foto bukti di shared hosting (InfinityFree / cPanel) tanpa symlink
+Route::get('/storage/{path}', [StorageFileController::class, 'show'])
+    ->where('path', '.*')
+    ->name('storage.file');
 
 // Arahkan pengunjung halaman utama langsung ke beranda katalog siswa (tanpa login)
 Route::get('/', function () {

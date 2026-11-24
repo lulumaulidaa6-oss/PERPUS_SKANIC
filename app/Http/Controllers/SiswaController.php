@@ -74,6 +74,7 @@ class SiswaController extends Controller
             }
 
             $fotoPath = $request->file('bukti_foto')->store('bukti_pinjam', 'public');
+            StorageFileController::syncToPublic($fotoPath);
 
             // Saat peminjaman masih menunggu persetujuan (menunggu): stok buku tidak berkurang
             Peminjaman::create([
@@ -161,6 +162,7 @@ class SiswaController extends Controller
             }
 
             $fotoPath = $request->file('foto_kembali')->store('bukti_kembali', 'public');
+            StorageFileController::syncToPublic($fotoPath);
 
             // Jika pengembalian belum dikonfirmasi admin: stok buku belum bertambah
             $pinjam->update([

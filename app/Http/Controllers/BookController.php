@@ -53,6 +53,7 @@ class BookController extends Controller
 
         // 2. Simpan file foto cover buku ke storage public
         $fotoPath = $request->file('foto')->store('buku', 'public');
+        StorageFileController::syncToPublic($fotoPath);
 
         // 3. Simpan data ke tabel books
         Book::create([
@@ -106,10 +107,14 @@ class BookController extends Controller
 
         // Jika admin mengunggah foto baru, hapus foto lama dan simpan yang baru
         if ($request->hasFile('foto')) {
-            if ($book->foto && Storage::disk('public')->exists($book->foto)) {
-                Storage::disk('public')->delete($book->foto);
+            if ($book->foto) {
+                if (Storage::disk('public')->exists($book->foto)) {
+                    Storage::disk('public')->delete($book->foto);
+                }
+                StorageFileController::deleteFromPublic($book->foto);
             }
             $data['foto'] = $request->file('foto')->store('buku', 'public');
+            StorageFileController::syncToPublic($data['foto']);
         }
 
         $book->update($data);
@@ -125,8 +130,11 @@ class BookController extends Controller
         $book = Book::findOrFail($id);
 
         // Hapus file cover buku dari penyimpanan jika ada
-        if ($book->foto && Storage::disk('public')->exists($book->foto)) {
-            Storage::disk('public')->delete($book->foto);
+        if ($book->foto) {
+            if (Storage::disk('public')->exists($book->foto)) {
+                Storage::disk('public')->delete($book->foto);
+            }
+            StorageFileController::deleteFromPublic($book->foto);
         }
 
         $book->delete();
